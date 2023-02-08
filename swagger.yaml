@@ -1,0 +1,259 @@
+openapi: 3.0.0
+info:
+  title: Movies-API
+  contact: {}
+  version: "1.0"
+servers:
+  - url: https://movie-api-production-a406.up.railway.app/api/v1
+    variables: {}
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register user
+      operationId: Registeruser
+      parameters: []
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/CreateuserRequest"
+                - example:
+                    name: victor
+                    email: victor5@gmail.com
+                    password: "12345"
+            example:
+              name: victor
+              email: victor5@gmail.com
+              password: "12345"
+        required: true
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+      security: []
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login User
+      operationId: LoginUser
+      parameters: []
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/LoginUserRequest"
+                - example:
+                    email: "victor@gmail.com"
+                    password: "12345"
+            example:
+              email: "victor@gmail.com"
+              password: "12345"
+        required: true
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+      security: []
+  /movie:
+    get:
+      tags:
+        - Movies
+      summary: Get all movies
+      operationId: Getallmovies
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+      security: []
+  /movie/search:
+    get:
+      tags:
+        - Movies
+      summary: Search movie
+      operationId: Searchmovie
+      parameters:
+        - name: director
+          in: query
+          description: ""
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: movie
+          in: query
+          description: ""
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: actor
+          in: query
+          description: ""
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+      security: []
+  /favorites:
+    get:
+      tags:
+        - Favorite
+      summary: Get all favorites
+      operationId: Getallfavorites
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+      security:
+        - bearer: []
+  /favorites/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The movie ID
+    post:
+      tags:
+        - Favorite
+      summary: Add to favorites
+      operationId: Addtofavorites
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+      security:
+        - bearer: []
+    delete:
+      tags:
+        - Favorite
+      summary: Delete favorite
+      operationId: Deletefavorite
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+      security:
+        - bearer: []
+
+    get:
+      tags:
+        - Favorite
+      summary: Get single favorite
+      operationId: Getsinglefavorite
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+      security:
+        - bearer: []
+
+    patch:
+      tags:
+        - Favorite
+      summary: Update favorite
+      operationId: Updatefavorite
+      parameters: []
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/UpdatefavoriteRequest"
+                - example:
+                    movieStatus: plan to watch
+            example:
+              movieStatus: plan to watch
+        required: true
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+      security:
+        - bearer: []
+components:
+  schemas:
+    CreateuserRequest:
+      title: CreateuserRequest
+      required:
+        - name
+        - email
+        - password
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        name: victor
+        email: victor5@gmail.com
+        password: "12345"
+    LoginUserRequest:
+      title: LoginUserRequest
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        email: ""
+        password: "12345"
+    UpdatefavoriteRequest:
+      title: UpdatefavoriteRequest
+      required:
+        - movieStatus
+      type: object
+      properties:
+        movieStatus:
+          type: string
+      example:
+        movieStatus: plan to watch
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+security: []
+tags:
+  - name: Auth
+    description: ""
+  - name: Movies
+    description: ""
+  - name: Favorite
+    description: ""

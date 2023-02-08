@@ -24,7 +24,7 @@ const getFavorite = async (req, res) => {
   if (myMovie.length <= 0) {
     throw new BadRequestError("Movie is not in my movies");
   }
-  console.log(myMovie);
+
   res.status(StatusCodes.OK).json({ data: myMovie });
 };
 
