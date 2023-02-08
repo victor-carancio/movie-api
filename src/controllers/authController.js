@@ -16,7 +16,7 @@ const createUser = async (req, res) => {
   const passwordHashed = await bcrypt.hash(password, saltRound);
 
   const [user] = await connectionDB.query(
-    "INSERT INTO user (userName, userEmail, password) VALUES (?,?,?)",
+    "INSERT INTO User (userName, userEmail, password) VALUES (?,?,?)",
     [name, email, passwordHashed]
   );
 
@@ -40,7 +40,7 @@ const loginUser = async (req, res) => {
   }
 
   const [user] = await connectionDB.query(
-    "SELECT * from user where userEmail = ?",
+    "SELECT * from User where userEmail = ?",
     [email]
   );
   if (user.length <= 0) {
