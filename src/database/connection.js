@@ -1,3 +1,4 @@
+//mysql connection
 const mysql = require("mysql2/promise");
 
 const connectionDB = mysql.createPool({
