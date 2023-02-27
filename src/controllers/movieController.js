@@ -1,36 +1,40 @@
 const { CustomAPIError, UnauthenticatedError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
-const connectionDB = require("../database/connection");
+const { connectionPgDB } = require("../database/connection");
 
 const getAllMovies = async (req, res) => {
-  const [movies] = await connectionDB.query("SELECT * FROM movie");
-  const moviesSort = [...movies].sort((a, b) => (a.title < b.title ? -1 : 1));
+  const { rows } = await connectionPgDB.query("SELECT * FROM movie");
+  // console.log(rows);
+
+  const moviesSort = [...rows].sort((a, b) => (a.title < b.title ? -1 : 1));
+
   res.status(StatusCodes.OK).json({ data: moviesSort });
 };
 
 const searchMovie = async (req, res) => {
   const { title, director, actor } = req.query;
   const objectQuery = {
-    title: `title LIKE '%%'`,
-    director: `director LIKE '%%'`,
-    actor: `star1 LIKE '%%' OR star2 LIKE '%%' OR star3 LIKE '%%' OR star4 LIKE '%%'`,
+    title: `title ILIKE '%%'`,
+    director: `director ILIKE '%%'`,
+    actor: `star1 ILIKE '%%' OR star2 ILIKE '%%' OR star3 ILIKE '%%' OR star4 ILIKE '%%'`,
   };
 
   if (title) {
-    objectQuery.title = `title LIKE '%${title}%'`;
+    objectQuery.title = `title ILIKE '%${title}%'`;
   }
   if (director) {
-    objectQuery.director = `director LIKE '%${director}%'`;
+    objectQuery.director = `director ILIKE '%${director}%'`;
   }
   if (actor) {
-    objectQuery.actor = `star1 LIKE '%${actor}%' OR star2 LIKE '%${actor}%' OR star3 LIKE '%${actor}%' OR star4 LIKE '%${actor}%'`;
+    objectQuery.actor = `star1 LIKE '%${actor}%' OR star2 ILIKE '%${actor}%' OR star3 ILIKE '%${actor}%' OR star4 ILIKE '%${actor}%'`;
   }
 
   const queryStr = `SELECT * FROM movie Where (${objectQuery.title}) AND (${objectQuery.director}) AND (${objectQuery.actor})`;
 
-  const [data] = await connectionDB.query(queryStr);
+  const { rows } = await connectionPgDB.query(queryStr);
+  connectionPgDB.end();
 
-  res.status(StatusCodes.OK).json({ movies: data, nbHits: data.length });
+  res.status(StatusCodes.OK).json({ movies: rows, nbHits: rows.length });
 };
 
 module.exports = { getAllMovies, searchMovie };

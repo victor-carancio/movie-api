@@ -1,7 +1,20 @@
 require("dotenv").config();
-const connectionDB = require("./database/connection.js");
+const { connectionPgDB } = require("./database/connection");
+// const connectionDB = require("./database/connection.js");
 
 const moviesCsv = require("../movieDataSet");
+
+const testConnection = async () => {
+  try {
+    const res = await connectionPgDB.query("Select * from movie");
+    console.log(res.rows.length);
+
+    await connectionPgDB.end();
+  } catch (error) {
+    console.log(error);
+  }
+};
+testConnection();
 
 const start = async () => {
   moviesCsv.forEach((element) => {
@@ -23,7 +36,8 @@ const start = async () => {
       Gross,
     } = element;
 
-    const insertStatement = `INSERT INTO movie ( posterLink ,title, releasedYear, certificate, runTime, genre, imdbRating, overview, director, star1, star2, star3, star4, votes, gross) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+    const insertStatement =
+      "INSERT INTO movie ( posterLink ,title, releasedYear, certificate, runTime, genre, imdbRating, overview, director, star1, star2, star3, star4, votes, gross) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)";
     const insertData = [
       Poster_Link,
       Series_Title,
@@ -48,12 +62,11 @@ const start = async () => {
 };
 
 const asyncInsertDB = async (statement, data) => {
-  await connectionDB.query(statement, data, true, (err, results, fields) => {
-    if (err) {
-      console.log("Unable to insert item at row ", i + 1);
-      return console.log(err);
-    }
-  });
+  try {
+    await pool.query(statement, data);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-start();
+// start();

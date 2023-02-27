@@ -1,6 +1,6 @@
 const { CustomAPIError, UnauthenticatedError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
-const connectionDB = require("../database/connection");
+const { connectionPgDB } = require("../database/connection");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -15,22 +15,27 @@ const createUser = async (req, res) => {
 
   const passwordHashed = await bcrypt.hash(password, saltRound);
 
-  const [user] = await connectionDB.query(
-    "INSERT INTO User (userName, userEmail, password) VALUES (?,?,?)",
+  const response = await connectionPgDB.query(
+    "INSERT INTO users (userName, userEmail, password) VALUES ($1,$2,$3)",
     [name, email, passwordHashed]
   );
 
+  const userCreated = await connectionPgDB.query(
+    `SELECT userid from users where userEmail = '${email}'`
+  );
+
   const token = jwt.sign(
-    { userId: user.insertId, name },
+    { userId: userCreated.rows[0].userid, name },
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_LIFETIME,
     }
   );
 
-  res
-    .status(StatusCodes.CREATED)
-    .json({ user: { userId: user.insertId, userName: name }, token });
+  res.status(StatusCodes.CREATED).json({
+    user: { userId: userCreated.rows[0].userid, userName: name },
+    token,
+  });
 };
 
 const loginUser = async (req, res) => {
@@ -39,22 +44,25 @@ const loginUser = async (req, res) => {
     throw new CustomAPIError("Please provide credentials");
   }
 
-  const [user] = await connectionDB.query(
-    "SELECT * from User where userEmail = ?",
-    [email]
+  const currUser = await connectionPgDB.query(
+    `SELECT * from users where userEmail = '${email}'`
   );
-  if (user.length <= 0) {
+
+  if (currUser.rows.length <= 0) {
     throw new UnauthenticatedError("Invalid Credentials");
   }
 
-  const isPasswordCorrect = await bcrypt.compare(password, user[0].password);
+  const isPasswordCorrect = await bcrypt.compare(
+    password,
+    currUser.rows[0].password
+  );
 
   if (!isPasswordCorrect) {
     throw new UnauthenticatedError("Invalid Credentials");
   }
 
   const token = jwt.sign(
-    { userId: user[0].userId, name: user[0].userName },
+    { userId: currUser.rows[0].userid, name: currUser.rows[0].username },
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_LIFETIME,
@@ -62,7 +70,10 @@ const loginUser = async (req, res) => {
   );
 
   res.status(StatusCodes.OK).json({
-    user: { userId: user[0].userId, userName: user[0].userName },
+    user: {
+      userId: currUser.rows[0].userid,
+      userName: currUser.rows[0].username,
+    },
     token,
   });
 };
