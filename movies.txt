@@ -1,0 +1,35 @@
+CREATE TABLE IF NOT EXISTS movie (
+  movieId SERIAL PRIMARY KEY,
+  posterLink VARCHAR(405) DEFAULT NULL,
+  title VARCHAR(125) DEFAULT NULL,
+  releasedYear VARCHAR(10) DEFAULT NULL,
+  certificate VARCHAR(10) DEFAULT NULL,
+  runTime VARCHAR(15) DEFAULT NULL,
+  genre VARCHAR(40) DEFAULT NULL,
+  imdbRating VARCHAR(10) DEFAULT NULL,
+  overview VARCHAR(400) DEFAULT NULL,
+  director VARCHAR(55) DEFAULT NULL,
+  star1 VARCHAR(55) DEFAULT NULL,
+  star2 VARCHAR(55) DEFAULT NULL,
+  star3 VARCHAR(55) DEFAULT NULL,
+  star4 VARCHAR(55) DEFAULT NULL,
+  votes VARCHAR(15) DEFAULT NULL,
+  gross VARCHAR(30) DEFAULT NULL
+);
+
+CREATE TABLE "users" (
+  userId SERIAL PRIMARY KEY,
+  userName VARCHAR(20) NOT NULL,
+  userEmail VARCHAR(25) UNIQUE NOT NULL,
+  password VARCHAR(60) NOT NULL
+);
+
+CREATE TABLE mymovies (
+  id SERIAL PRIMARY KEY,
+  user_Id INT NOT NULL,
+  movie_Id INT NOT NULL,
+  movieStatus VARCHAR(15) DEFAULT '-',
+  CHECK (movieStatus IN ('watched', 'plan to watch', '-')),
+  FOREIGN KEY (user_Id) REFERENCES "users" (userId),
+  FOREIGN KEY (movie_Id) REFERENCES movie (movieId)
+);
