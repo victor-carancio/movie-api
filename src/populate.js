@@ -14,7 +14,7 @@ const testConnection = async () => {
     console.log(error);
   }
 };
-testConnection();
+// testConnection();
 
 const start = async () => {
   moviesCsv.forEach((element) => {
@@ -63,10 +63,10 @@ const start = async () => {
 
 const asyncInsertDB = async (statement, data) => {
   try {
-    await pool.query(statement, data);
+    await connectionPgDB.query(statement, data);
   } catch (error) {
     console.log(error);
   }
 };
 
-// start();
+start();
