@@ -4,7 +4,7 @@ info:
   contact: {}
   version: "1.0"
 servers:
-  - url: https://movie-api-jyy5.onrender.com/
+  - url: https://movie-api-jyy5.onrender.com/api/v1
     variables: {}
 paths:
   /auth/register:
